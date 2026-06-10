@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>商城登录</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Microsoft YaHei",sans-serif;background:#f0f2f5;display:flex;justify-content:center;align-items:center;min-height:100vh}
+.login-box{background:#fff;padding:40px;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,0.1);width:380px}
+h2{text-align:center;color:#1a1a2e;margin-bottom:30px;font-size:24px}
+.form-group{margin-bottom:20px}
+label{display:block;margin-bottom:6px;color:#333;font-size:14px}
+input{width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:6px;font-size:14px;outline:none;transition:border-color 0.3s}
+input:focus{border-color:#4a6cf7}
+input.error{border-color:#e74c3c}
+.error-msg{color:#e74c3c;font-size:12px;margin-top:4px;display:none}
+.error-msg.show{display:block}
+button{width:100%;padding:12px;background:#4a6cf7;color:#fff;border:none;border-radius:6px;font-size:16px;cursor:pointer;transition:background 0.3s}
+button:hover{background:#3b5de7}
+button:disabled{background:#ccc;cursor:not-allowed}
+.success{text-align:center;color:#27ae60;font-size:14px;margin-top:16px;display:none}
+.success.show{display:block}
+</style>
+</head>
+<body>
+<div class="login-box">
+  <h2>商城登录</h2>
+  <form id="login-form">
+    <div class="form-group">
+      <label>用户名</label>
+      <input type="text" id="username" placeholder="请输入用户名" autocomplete="off">
+      <div class="error-msg" id="username-error">用户名不能为空</div>
+    </div>
+    <div class="form-group">
+      <label>密码</label>
+      <input type="password" id="password" placeholder="请输入密码">
+      <div class="error-msg" id="password-error">密码至少6位</div>
+    </div>
+    <button type="submit" id="login-btn">登 录</button>
+  </form>
+  <div class="success" id="success-msg">登录成功，正在跳转...</div>
+</div>
+<script>
+document.getElementById("login-form").addEventListener("submit", function(e) {
+  e.preventDefault();
+  var u = document.getElementById("username").value.trim();
+  var p = document.getElementById("password").value;
+  var valid = true;
+
+  if (!u) {
+    document.getElementById("username").classList.add("error");
+    document.getElementById("username-error").classList.add("show");
+    valid = false;
+  } else {
+    document.getElementById("username").classList.remove("error");
+    document.getElementById("username-error").classList.remove("show");
+  }
+
+  if (p.length < 6) {
+    document.getElementById("password").classList.add("error");
+    document.getElementById("password-error").classList.add("show");
+    valid = false;
+  } else {
+    document.getElementById("password").classList.remove("error");
+    document.getElementById("password-error").classList.remove("show");
+  }
+
+  if (valid) {
+    document.getElementById("login-btn").disabled = true;
+    document.getElementById("login-btn").textContent = "登录中...";
+    setTimeout(function() {
+      document.getElementById("success-msg").classList.add("show");
+    }, 800);
+  }
+});
+</script>
+</body>
+</html>

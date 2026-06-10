@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>商品列表</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Microsoft YaHei",sans-serif;background:#f5f5f5}
+header{background:#1a1a2e;color:#fff;padding:16px 40px;display:flex;justify-content:space-between;align-items:center}
+header h1{font-size:20px}
+nav a{color:#ccc;text-decoration:none;margin-left:24px;font-size:14px}
+nav a:hover{color:#fff}
+#cart-count{background:#e74c3c;color:#fff;border-radius:10px;padding:2px 8px;font-size:12px;margin-left:4px}
+.container{max-width:1100px;margin:0 auto;padding:24px}
+.search-bar{margin-bottom:24px}
+.search-bar input{width:100%;padding:10px 16px;border:1px solid #ddd;border-radius:8px;font-size:14px;outline:none}
+.search-bar input:focus{border-color:#4a6cf7}
+.products{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:20px}
+.card{background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,0.08);transition:transform 0.2s}
+.card:hover{transform:translateY(-2px)}
+.card-img{height:160px;display:flex;align-items:center;justify-content:center;font-size:48px}
+.card-body{padding:16px}
+.card-body h3{font-size:16px;margin-bottom:8px}
+.price{color:#e74c3c;font-size:18px;font-weight:bold}
+.price .original{color:#999;font-size:13px;text-decoration:line-through;margin-left:8px;font-weight:normal}
+.card-body button{width:100%;margin-top:12px;padding:8px;background:#4a6cf7;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:14px}
+.card-body button:hover{background:#3b5de7}
+.card-body button.in-cart{background:#27ae60}
+#toast{position:fixed;top:20px;right:20px;background:#27ae60;color:#fff;padding:12px 20px;border-radius:8px;display:none;z-index:999}
+#toast.show{display:block}
+</style>
+</head>
+<body>
+<header>
+  <h1>优品商城</h1>
+  <nav>
+    <a href="index.html">商品列表</a>
+    <a href="cart.html" id="cart-link">购物车<span id="cart-count">0</span></a>
+    <a href="login.html">登录</a>
+  </nav>
+</header>
+<div class="container">
+  <div class="search-bar">
+    <input type="text" id="search-input" placeholder="搜索商品...">
+  </div>
+  <div class="products" id="product-list"></div>
+</div>
+<div id="toast">已加入购物车</div>
+
+<script>
+var products = [
+  {id:1,name:"无线蓝牙耳机 Pro",price:299,originalPrice:599,icon:"🎧",category:"数码"},
+  {id:2,name:"机械键盘 RGB背光",price:459,originalPrice:699,icon:"⌨️",category:"数码"},
+  {id:3,name:"轻薄商务双肩包",price:189,originalPrice:359,icon:"🎒",category:"服饰"},
+  {id:4,name:"保温咖啡杯 500ml",price:89,originalPrice:129,icon:"☕",category:"生活"},
+  {id:5,name:"运动智能手环",price:199,originalPrice:399,icon:"⌚",category:"数码"},
+  {id:6,name:"简约帆布单肩包",price:129,originalPrice:259,icon:"👜",category:"服饰"},
+  {id:7,name:"便携充电宝 20000mAh",price:139,originalPrice:229,icon:"🔋",category:"数码"},
+  {id:8,name:"全自动晴雨伞",price:69,originalPrice:99,icon:"🌂",category:"生活"},
+];
+
+var cart = JSON.parse(localStorage.getItem("cart") || "[]");
+
+function isInCart(id) { return cart.some(function(p){return p.id===id}); }
+function updateCartCount() {
+  var count = cart.reduce(function(s,p){return s+p.qty}, 0);
+  document.getElementById("cart-count").textContent = count;
+}
+
+function renderProducts(list) {
+  var el = document.getElementById("product-list");
+  el.innerHTML = list.map(function(p){
+    var inCart = isInCart(p.id);
+    return "<div class='card' data-id='"+p.id+"' data-category='"+p.category+"'>"+
+      "<div class='card-img'>"+p.icon+"</div>"+
+      "<div class='card-body'>"+
+        "<h3>"+p.name+"</h3>"+
+        "<span class='price'>$"+p.price+
+          "<span class='original'>$"+p.originalPrice+"</span></span>"+
+        "<button class='"+(inCart?"in-cart":"")+"' onclick='addToCart("+p.id+")'>"+
+          (inCart?"已加入购物车":"加入购物车")+"</button>"+
+      "</div></div>";
+  }).join("");
+}
+
+window.addToCart = function(id) {
+  var p = products.find(function(x){return x.id===id});
+  var existing = cart.find(function(x){return x.id===id});
+  if (existing) { existing.qty++; }
+  else { cart.push({id:p.id,name:p.name,price:p.price,qty:1}); }
+  localStorage.setItem("cart", JSON.stringify(cart));
+  updateCartCount();
+  renderProducts(products);
+  var toast = document.getElementById("toast");
+  toast.classList.add("show");
+  setTimeout(function(){toast.classList.remove("show")}, 1500);
+};
+
+document.getElementById("search-input").addEventListener("input", function(e) {
+  var kw = e.target.value.toLowerCase();
+  var filtered = products.filter(function(p){
+    return p.name.toLowerCase().includes(kw) || p.category.includes(kw);
+  });
+  renderProducts(filtered);
+});
+
+updateCartCount();
+renderProducts(products);
+</script>
+</body>
+</html>
